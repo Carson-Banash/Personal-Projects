@@ -48,11 +48,27 @@ def en_win():
 
 def dc_win():
     
-    window = Toplevel()
-    window.configure(bg='black')
-    window.title("Encoder")
-    close2 = Button(window, text='close window', fg='orange', command=window.destroy)
-    close2.pack()
+    dc_window = Toplevel()
+    dc_window.configure(bg='black')
+    dc_window.title("Encoder")
+
+    msg_lbl = Label(dc_window, text='What is the message you would like to decode? \n (excluding the page number)', bg='black', fg='red')
+    msg_lbl.grid(row=0, column=0, columnspan=3, pady=3, sticky=W)
+
+    msg_ent = Entry(dc_window, bg='grey', fg='white', width=35)
+    msg_ent.grid(row=1, column=0, columnspan=3, sticky=W)
+
+    bk_msg_lbl = Label(dc_window, text='What is the book exerpt?', bg='black', fg='red')
+    bk_msg_lbl.grid(row=2, column=0, pady=3, sticky=W)
+
+    bk_msg_ent = Entry(dc_window, bg='grey', fg='white', width=35)
+    bk_msg_ent.grid(row=3, column=0, columnspan=3, sticky=W)
+
+    decode_btn = Button(dc_window, text='Decode', command=decode(), bg='black', fg='red')
+    decode_btn.grid(row=4, column=0, sticky=W, pady=5)
+
+    close2 = Button(dc_window, text='Close Window', command=dc_window.destroy, bg='black', fg='red')
+    close2.grid(row=4, column=2, sticky=E, pady=5)
 
 
 
