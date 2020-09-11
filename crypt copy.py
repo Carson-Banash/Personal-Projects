@@ -2,9 +2,28 @@
 from tkinter import *
 from tkmacosx import Button #this is needed to change the colour of the buttons (mac osx bug)
 
+cipher_encode_dictinary = {'a':'1','b':'2','c':'3','d':'4','e':'5','f':'6','g':'7','h':'8','i':'9','j':'10','k':'11','l':'12','m':'13'
+,'n':'14','o':'15','p':'16','q':'17','r':'18','s':'19','t':'20','u':'21','v':'22','w':'23','x':'24','y':'25','z':'26'
+}
+
 #defines the encode function
-def encode():
-    pass
+def encode(message): # , bk_message, bk_pg_num):
+    #encoded_msg.delete(0.0,END)
+    msg_numbers = []
+    
+
+    msg_cln = message.lower()
+    msg_cln = msg_cln.replace(" ","")
+    msg_chars = list(msg_cln)
+
+    
+
+    for i in range(len(msg_chars)):
+        number = cipher_encode_dictinary[msg_chars[i]]
+        msg_numbers.append(number)
+
+    print(msg_numbers)
+    #encoded_msg.insert(END, msg_numbers)
 
 #defines the decode function
 def decode():
@@ -13,6 +32,7 @@ def decode():
 #defines the encode window
 def en_win():
     #creates the encode window and configures it
+    en_window = Tk()
     en_window = Toplevel()
     en_window.configure(bg='black')
     en_window.title("Encoder")
@@ -40,11 +60,11 @@ def en_win():
     encoded_msg.grid(row=6, column=0, columnspan=3, sticky=W, pady=3)
 
     #creates the encode button 
-    encode_btn = Button(en_window, text='Encode', command=encode(), bg='black', fg='red')
+    encode_btn = Button(en_window, text='Encode', command=encode(msg_ent.get()), bg='black', fg='red')
     encode_btn.grid(row=7, column=0, sticky=W, pady=5)
 
     #creates the close window button
-    close = Button(en_window, text='Close Window', command=en_window.destroy, bg='black', fg='red')
+    close = Button(en_window, text='Close Window', command=print(msg_ent.get()), bg='black', fg='red')
     close.grid(row=7, column=2, sticky=E, pady=5)
 
 #defines the decode window
