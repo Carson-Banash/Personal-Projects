@@ -22,7 +22,7 @@ def encode(message): # , bk_message, bk_pg_num):
         number = cipher_encode_dictinary[msg_chars[i]]
         msg_numbers.append(number)
 
-    print(msg_numbers)
+    #print(msg_numbers)
     #encoded_msg.insert(END, msg_numbers)
 
 #defines the decode function
@@ -32,7 +32,6 @@ def decode():
 #defines the encode window
 def en_win():
     #creates the encode window and configures it
-    en_window = Tk()
     en_window = Toplevel()
     en_window.configure(bg='black')
     en_window.title("Encoder")
@@ -64,7 +63,7 @@ def en_win():
     encode_btn.grid(row=7, column=0, sticky=W, pady=5)
 
     #creates the close window button
-    close = Button(en_window, text='Close Window', command=print(msg_ent.get()), bg='black', fg='red')
+    close = Button(en_window, text='Close Window', command=en_window.destroy, bg='black', fg='red')
     close.grid(row=7, column=2, sticky=E, pady=5)
 
 #defines the decode window
