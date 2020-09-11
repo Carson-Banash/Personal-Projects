@@ -10,11 +10,7 @@ def encode():
 def decode():
     pass
 
-#sets up and configures the main window
-root = Tk()
-root.title("Main Window")
-root.configure(bg='black')
-
+#defines the encode window
 def en_win():
     #creates the encode window and configures it
     en_window = Toplevel()
@@ -51,6 +47,7 @@ def en_win():
     close = Button(en_window, text='Close Window', command=en_window.destroy, bg='black', fg='red')
     close.grid(row=7, column=2, sticky=E, pady=5)
 
+#defines the decode window
 def dc_win():
     #creates the decode window and configures it 
     dc_window = Toplevel()
@@ -79,6 +76,11 @@ def dc_win():
 
 
 ##all of the code for the main page where you choose whether to decode or encode
+
+#sets up and configures the main window
+root = Tk()
+root.title("Main Window")
+root.configure(bg='black')
 
 #the main prompt
 title = Label(root, text='Welcome to the secret message encoder/decoder \n wich one would you like?', bg='black', fg='red')
