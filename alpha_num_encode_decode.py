@@ -27,9 +27,8 @@ def alpha_decode (numb_message):
 
     return decoded_letters
 
-en_or_de = input("Would you like to Encode [E] or Decode [D]?")
+en_or_de = str(input("Would you like to Encode [E] or Decode [D]? "))
 anwser_cln = en_or_de.lower()
-
 if anwser_cln == 'e':
     encoded_msg = alpha_encode(input('What is the message that you would like to encode? '))
     listToStr = ' '.join([str(elem) for elem in encoded_msg])
