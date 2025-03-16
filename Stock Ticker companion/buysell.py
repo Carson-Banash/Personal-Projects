@@ -66,16 +66,6 @@ while True:
         player_info = list(cursor.fetchone())
 
         update_elements(sell_lst,player_info,4)
-
-        # i = 4
-        # for key in ['sell_grain','sell_ind','sell_bonds','sell_oil','sell_silver','sell_gold']:
-        #     owned = []
-
-        #     for k in range(0,player_info[i]+1):
-        #         owned.append(k)
-
-        #     window[key].update(value=0, values=owned)
-        #     i += 1
         
         cursor.execute("SELECT * FROM board_info WHERE ID=(SELECT max(ID) FROM board_info);")
         sec_price = list(cursor.fetchone())
@@ -115,7 +105,7 @@ while True:
         amm_sell = []
         for key in sell_lst:            
             #appends the value of the chosen amount to sell to the list
-            amm_sell.append(values[key])
+            amm_sell.append(int(values[key]))
         
         #the following creates the list that stores the owned amount of securities from the database 
         amm_owned = []
@@ -132,7 +122,7 @@ while True:
         #back to zero
         if not all(isinstance(sec, int) for sec in amm_sell):
             #the following loop is for setting the chosen amounts back to zero
-            for key in ['sell_grain','sell_ind','sell_bonds','sell_oil','sell_silver','sell_gold']:
+            for key in sell_lst:
                 window[key].update(value=0)
             #creates a popup explain to the user the error
             sg.popup("Error!\nYou are trying to sell more securities than that player owns!")
@@ -157,11 +147,7 @@ while True:
         total_cash = cash + cash_sell
 
         print('cash in hand: %d\ncash from selling: %d\nnew total cash: %d'%(cash,cash_sell,total_cash))
-        # net_worth = 0
-        # for i in range(6):
-        #     net_worth += final_amm[i] * sec_value[i]
         
-        # net_worth += total_cash
         new_player_info = [None,player_info[1]+1, ch_name, total_cash]+final_amm+[player_info[10]]
         cursor.execute("INSERT INTO player_info VALUES (?,?,?,?,?,?,?,?,?,?,?)", (new_player_info))
         connection.commit()
@@ -200,7 +186,7 @@ while True:
         amm_buy = []
         for key in buy_lst:            
             #appends the value of the chosen amount to buy to the list
-            amm_buy.append(values[key])
+            amm_buy.append(int(values[key]))
 
         cash_buy = 0
         for i in range(6):
@@ -288,6 +274,18 @@ while True:
         
         cash_left = cash - cash_buy
         print('changed value\nThe cash left is: ',cash_left)
+
+        #if the user has somehow selected more securities than they can afford their money will be below zero, 
+        #the following catches that and shows a popup window to the user and sets all the securities chosen
+        #back to zero
+        if cash_left < 0:
+            #the following loop is for setting the chosen amounts back to zero
+            for key in buy_lst:
+                window[key].update(value=0)
+            #creates a popup explain to the user the error
+            sg.popup("Error!\nYou are trying to buy more securities than that player can afford!")
+            #skips the rest of the error due to the error
+            continue
 
         i = 0
         for sec in buy_lst:
