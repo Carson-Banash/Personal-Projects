@@ -272,17 +272,47 @@ while True:
         amm_buy = []
         for key in buy_lst:            
             #appends the value of the chosen amount to buy to the list
-            amm_buy.append(values[key])
+            amm_buy.append(int(values[key]))
+        
         print(prev_buy, 'Before')
         print(amm_buy, ' amount bought')
+
         for key in buy_lst:
             if key == event:
                 amm_buy[amm_buy_key[event]] = amm_buy[amm_buy_key[event]]+prev_buy[amm_buy_key[event]]
+                window[event].update(value=amm_buy[amm_buy_key[event]])
                 print(amm_buy,'After')
-        #FIXME: need to update the event combo with the new added amount
-        #FIXME: also need to calculate the new amount that the player can buy of other securities
+        
+        cash_buy = 0
+        for i in range(6):
+            cash_buy += sec_value[i] * amm_buy[i]
+        
+        cash_left = cash - cash_buy
+        print('changed value\nThe cash left is: ',cash_left)
 
+        i = 0
+        for sec in buy_lst:
+            if sec in changed:
+                
+                print('cash left: ',cash_left,'security value: ',sec_value[i],'max amount to buy: ',cash_left//sec_value[i])
+                max_amm_buy = []
+                for j in range(-1*(amm_buy[i]),(cash_left//sec_value[i])+1):
+                    max_amm_buy.append(j)
+                
+                print('the new amount to buy is: ',max_amm_buy)
+                window[sec].update(value=amm_buy[amm_buy_key[sec]],values=max_amm_buy)
+                i += 1
+            elif sec == event:
+                print('is changed value, not modifying')
+                i+=1
+            else:
+                max_amm_buy = []
+                for j in range((cash_left//sec_value[i])+1):
+                    max_amm_buy.append(j)
 
+                window[sec].update(value=0, values=max_amm_buy)
+
+                i += 1
 
 
     elif event == 'buy':
@@ -357,10 +387,14 @@ while True:
         sg.set_options(font=('Arial', 18))
         sg.popup("The amount of money needed is:\n%d"%cash_buy)
 
-     #the following gets the amount of securities to buy before a new selection is made
+
+    event, values = window.read(timeout=1)
+    print(event)
+    
+    #the following gets the amount of securities to buy before a new selection is made
     prev_buy = []
     for key in buy_lst:            
         #appends the value of the chosen amount to previously bought list
-        prev_buy.append(values[key])
+        prev_buy.append(int(values[key]))
     
-    print(prev_buy)
+    print('previously bought',prev_buy)
