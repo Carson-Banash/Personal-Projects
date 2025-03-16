@@ -202,10 +202,17 @@ while True:
             #appends the value of the chosen amount to buy to the list
             amm_buy.append(values[key])
 
-        #if the user has input an amount of any security that the player does not own it is saved as a string
-        #the following catches that error, shows a popup window to the user and sets all the securities chosen
+        cash_buy = 0
+        for i in range(6):
+            cash_buy += sec_value[i] * amm_buy[i]
+        
+        cash_left = cash - cash_buy
+        print('The cash left is: ',cash_left)
+
+        #if the user has somehow selected more securities than they can afford their money will be below zero, 
+        #the following catches that and shows a popup window to the user and sets all the securities chosen
         #back to zero
-        if not all(isinstance(sec, int) for sec in amm_buy):
+        if cash_left < 0:
             #the following loop is for setting the chosen amounts back to zero
             for key in buy_lst:
                 window[key].update(value=0)
@@ -213,14 +220,6 @@ while True:
             sg.popup("Error!\nYou are trying to buy more securities than that player can afford!")
             #skips the rest of the error due to the error
             continue
-
-
-        cash_buy = 0
-        for i in range(6):
-            cash_buy += sec_value[i] * amm_buy[i]
-        
-        cash_left = cash - cash_buy
-        print('The cash left is: ',cash_left)
 
         # print(cash_buy)
 
