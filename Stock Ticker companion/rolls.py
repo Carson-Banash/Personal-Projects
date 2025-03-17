@@ -102,6 +102,12 @@ while True:
             result = [*tpl_result]
             #sets the first element to none, this is so that when the values are added back to the database the ID, indicating the most recent entry, will be auto incremented
             result[0] = None
+
+            #gets the current players
+            cursor.execute("SELECT DISTINCT name FROM player_info;")
+            player_result = cursor.fetchall() 
+            #creates a list of the list of tuples returned by the database
+            players = [item for name in player_result for item in name]
             
             #calculates the position of the chosen security in the database
             poss = sec_key[ch_sec]
@@ -114,12 +120,6 @@ while True:
             if new >= 2000:
                 #the new value is now 1000 as the security is set back to the par line of 1000
                 new = 1000
-
-                #gets the current players
-                cursor.execute("SELECT DISTINCT name FROM player_info;")
-                player_result = cursor.fetchall() 
-                #creates a list of the list of tuples returned by the database
-                players = [item for name in player_result for item in name]
 
                 #starts the message that will be in a popup telling the user how many securities should be handed out
                 msg = f"{ch_sec} has Split!!\n"
@@ -158,6 +158,26 @@ while True:
                 popup_msg = ''.join([str(i) for i in split_msg])
                 #makes the popup with the message created above
                 sg.popup(popup_msg, title=f'{ch_sec} Has Split')
+            else: 
+                for player in players:
+                    #gets the most recent entry from the database for the player
+                    cursor.execute("SELECT * FROM player_info WHERE name = '"+player+"' AND RECENT=(SELECT max(RECENT) FROM player_info WHERE name='"+player+"');")
+                    player_info = list(cursor.fetchone())
+
+                    net_worth = player_info[10] + ((10*int(ch_amm))*player_info[player_sec_key[ch_sec]])
+                    print(f"{player}'s net worth has changed by {((10*int(ch_amm))*player_info[player_sec_key[ch_sec]])}")
+
+                    #creates the new player info that will be added to the database. the only values that are changed are the recent modifier and the new net worth
+                    new_player_info = player_info.copy()
+                    new_player_info[1] = new_player_info[1] + 1
+                    new_player_info[10] = net_worth
+                    
+                    print(player_info)
+                    print(new_player_info,'\n')
+                    #adds the new player entry to the database 
+                    # cursor.execute("INSERT INTO player_info VALUES (?,?,?,?,?,?,?,?,?,?,?)", (new_player_info))
+                    # connection.commit()
+                    
 
             #replaces the old market value for the chosen security with the new value
             result[poss] = new 
