@@ -81,6 +81,8 @@ while True:
  
         #this dictionary is used to determine where the security is in the return of the board info database
         sec_key = {'grain':1,'ind':2,'bonds':3,'oil':4,'silver':5,'gold':6}
+        #dictionary required for getting values from the database 
+        player_sec_key = {'grain':4,'ind':5,'bonds':6,'oil':7,'silver':8,'gold':9}
 
         #if any of the chosen variables ar None then a radio element in the window was not selected
         if ch_sec == None or ch_mod == None or ch_amm == None:
@@ -111,15 +113,58 @@ while True:
             #if the new value is more than 2000 then the security has split and the market value is returned to 1000
             if new >= 2000:
                 new = 1000
-                #TODO: add the split functionality to the player stuff
-                print('Split!')
+
+                #gets the current players
+                cursor.execute("SELECT DISTINCT name FROM player_info;")
+                player_result = cursor.fetchall() 
+
+                #creates a list of the list of tuples returned by the database
+                players = [item for name in player_result for item in name]
+
+                #starts the message that will be in a popup telling the user how many securities should be handed out
+                msg = f"{ch_sec} has Split!!\n"
+                #initializes the list that will be used to create the popup telling the banker what the payout should be to each player
+                split_msg = []
+                for player in players:
+                    #gets the most recent entry from the database for the player
+                    cursor.execute("SELECT * FROM player_info WHERE name = '"+player+"' AND RECENT=(SELECT max(RECENT) FROM player_info WHERE name='"+player+"');")
+                    player_info = list(cursor.fetchone())
+                    
+                    #gets the previous amount of the split security
+                    old_sec_amm = player_info[player_sec_key[ch_sec]]
+                    #doubles the amount of the split security owned
+                    new_sec_amm = old_sec_amm*2
+
+                    #calculates the new new worth as difference between the max market value, 2000, and the old market value before the split.
+                    #this is then multiplied by the amount of securities the player used to own. this new amount is then added to the old net worth
+                    net_worth = player_info[10]+((2000-old)*old_sec_amm)
+                    
+                    #if the new security is zero then the player does not own any shares in that security so they should not be added to the popup message
+                    if new_sec_amm != 0:
+                        #creates the string for the player that will be displayed in the popup window for the amount of the payout to receive
+                        msg = str(f"{player} gets {old_sec_amm} more {ch_sec} for a total of {new_sec_amm}\n")
+                        #extends the ongoing list of payout messages
+                        split_msg.extend(msg)
+
+                    #creates the new player info that will be added to the database. the only values that are changed are the recent modifier, the doubled amount of the chosen security and the new net worth
+                    new_player_info = [None,player_info[1]+1,player_info[2],player_info[3]]+player_info[4:10]+[net_worth]
+                    new_player_info[player_sec_key[ch_sec]] = new_sec_amm
+
+                    #adds the new player entry to the database 
+                    cursor.execute("INSERT INTO player_info VALUES (?,?,?,?,?,?,?,?,?,?,?)", (new_player_info))
+                    connection.commit()
 
             #replaces the old market value for the chosen security with the new value
             result[poss] = new 
+
+            #creates the message for the popup window as the combination of all the messages from the different players
+            popup_msg = ''.join([str(i) for i in split_msg])
+            #makes the popup with the message created above
+            sg.popup(popup_msg, title=f'{ch_sec} Has Split')
             
             #adds the new value along with the other unchanged values to the database
-            cursor.execute("INSERT INTO board_info VALUES (?,?,?,?,?,?,?)", (result))
-            connection.commit()
+            # cursor.execute("INSERT INTO board_info VALUES (?,?,?,?,?,?,?)", (result))
+            # connection.commit()
 
         elif ch_mod == 'down':
             cursor.execute("SELECT * FROM board_info WHERE ID=(SELECT max(ID) FROM board_info);")
@@ -156,10 +201,7 @@ while True:
                 print("NO DIVIDEND!")
             #otherwise it will pay a dividend
             else:
-                #dictionary required for getting values from the database 
-                player_sec_key = {'grain':4,'ind':5,'bonds':6,'oil':7,'silver':8,'gold':9}
-
-                #gets the current security market values
+                #gets the current players
                 cursor.execute("SELECT DISTINCT name FROM player_info;")
                 result = cursor.fetchall() 
 
