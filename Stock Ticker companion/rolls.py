@@ -112,12 +112,12 @@ while True:
 
             #if the new value is more than 2000 then the security has split and the market value is returned to 1000
             if new >= 2000:
+                #the new value is now 1000 as the security is set back to the par line of 1000
                 new = 1000
 
                 #gets the current players
                 cursor.execute("SELECT DISTINCT name FROM player_info;")
                 player_result = cursor.fetchall() 
-
                 #creates a list of the list of tuples returned by the database
                 players = [item for name in player_result for item in name]
 
@@ -154,13 +154,13 @@ while True:
                     cursor.execute("INSERT INTO player_info VALUES (?,?,?,?,?,?,?,?,?,?,?)", (new_player_info))
                     connection.commit()
 
+                #creates the message for the popup window as the combination of all the messages from the different players
+                popup_msg = ''.join([str(i) for i in split_msg])
+                #makes the popup with the message created above
+                sg.popup(popup_msg, title=f'{ch_sec} Has Split')
+
             #replaces the old market value for the chosen security with the new value
             result[poss] = new 
-
-            #creates the message for the popup window as the combination of all the messages from the different players
-            popup_msg = ''.join([str(i) for i in split_msg])
-            #makes the popup with the message created above
-            sg.popup(popup_msg, title=f'{ch_sec} Has Split')
             
             #adds the new value along with the other unchanged values to the database
             # cursor.execute("INSERT INTO board_info VALUES (?,?,?,?,?,?,?)", (result))
@@ -177,14 +177,66 @@ while True:
 
             old = result[poss]
             new = old + ((10*int(ch_amm)) * -1)
+            
+            #if the market value of a security falls to zero or below the security has 'busted' all owned securities by players are returned to the banker and the security marker is returned to the par line of 1000
             if new <= 0:
+                #since the stock has busted it is set back to the par of 1000
                 new = 1000
-                print('Rollover: Low')
-            result[poss] = new
+
+                #gets the current players
+                cursor.execute("SELECT DISTINCT name FROM player_info;")
+                player_result = cursor.fetchall() 
+                #creates a list of the list of tuples returned by the database
+                players = [item for name in player_result for item in name]
+
+                #starts the message that will be in a popup telling the user how many securities should be handed out
+                msg = f"{ch_sec} has Busted!!\n"
+                #initializes the list that will be used to create the popup telling the banker what the payout should be to each player
+                bust_msg = []
+                for player in players:
+                    #gets the most recent entry from the database for the player
+                    cursor.execute("SELECT * FROM player_info WHERE name = '"+player+"' AND RECENT=(SELECT max(RECENT) FROM player_info WHERE name='"+player+"');")
+                    player_info = list(cursor.fetchone())
+                    
+                    #gets the previous amount of the split security
+                    old_sec_amm = player_info[player_sec_key[ch_sec]]
+                    #sets the new amount to zero
+                    new_sec_amm = 0
+
+                    #calculates the new new worth as the total amount of the securities lost
+                    #this is then subtracted from the old net worth as the player has lost this value
+                    net_worth = player_info[10]-(old_sec_amm*old)
+                    print(f"{player}'s old net worth is ${player_info[10]}\nthe new net worth is ${net_worth}")
+                    
+                    #if the old security is zero then the player did not own any shares in that security so they should not be added to the popup message
+                    if old_sec_amm != 0:
+                        #creates the string for the player that will be displayed in the popup window for the amount of shares lost
+                        msg = str(f"{player} lost {old_sec_amm}\n")
+                        #extends the ongoing list of payout messages
+                        bust_msg.extend(msg)
+
+                    #creates the new player info that will be added to the database. the only values that are changed are the recent modifier, the doubled amount of the chosen security and the new net worth
+                    new_player_info = [None,player_info[1]+1,player_info[2],player_info[3]]+player_info[4:10]+[net_worth]
+                    new_player_info[player_sec_key[ch_sec]] = new_sec_amm
+                    print(player_info)
+                    print(new_player_info)
+                    #adds the new player entry to the database 
+                    # cursor.execute("INSERT INTO player_info VALUES (?,?,?,?,?,?,?,?,?,?,?)", (new_player_info))
+                    # connection.commit()
+
+                #creates the message for the popup window as the combination of all the messages from the different players
+                popup_msg = ''.join([str(i) for i in bust_msg])
+                #makes the popup with the message created above
+                sg.popup(popup_msg, title=f'{ch_sec} Has Split')
+                result[poss] = new
+
+            #replaces the old market value for the chosen security with the new value
+            result[poss] = new 
+
             # print(result)
 
-            cursor.execute("INSERT INTO board_info VALUES (?,?,?,?,?,?,?)", (result))
-            connection.commit()
+            # cursor.execute("INSERT INTO board_info VALUES (?,?,?,?,?,?,?)", (result))
+            # connection.commit()
 
         elif ch_mod == 'div':
             print("\ndiv chosen")
