@@ -123,15 +123,18 @@ while True:
             connection.commit()
         elif ch_mod == 'div':
             print("\ndiv chosen")
-
+            #gest all the current market values for the securities
             cursor.execute("SELECT * FROM board_info WHERE ID=(SELECT max(ID) FROM board_info);")
             tpl_result = cursor.fetchone()
+            #converts the tuple returned by the database to a list, its easier to deal with
             result = [*tpl_result]
-
+            #calculates the position of the chosen security in the database
             poss = sec_key[ch_sec]
-
+            
+            #if the value of the security is below 1000 the security will not pay a dividend
             if result[poss] < 1000:
                 print("NO DIVIDEND!")
+            #otherwise it will pay a dividend
             else:
                 #dictionary required for getting values from the database 
                 player_sec_key = {'grain':4,'ind':5,'bonds':6,'oil':7,'silver':8,'gold':9}
