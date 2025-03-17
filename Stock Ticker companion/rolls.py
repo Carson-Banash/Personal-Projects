@@ -91,23 +91,33 @@ while True:
                 roll_window[key].update(value=False)
             continue
         
+        #the following is responsible for taking the board info from the data base and incrementing the chosen security by the chosen rate
         elif ch_mod == 'up':
+            #gets the latest entry of the security market values from the database
             cursor.execute("SELECT * FROM board_info WHERE ID=(SELECT max(ID) FROM board_info);")
             tpl_result = cursor.fetchone()
+            #the following converts the return from the database from a tuple to a list
             result = [*tpl_result]
+            #sets the first element to none, this is so that when the values are added back to the database the ID, indicating the most recent entry, will be auto incremented
             result[0] = None
-            # print(result)
-
+            
+            #calculates the position of the chosen security in the database
             poss = sec_key[ch_sec]
-
+            #gets the value that is currently in the database
             old = result[poss]
+            #calculates the new amount as the addition of the old value and the dice roll rate
             new = old + 10*int(ch_amm)
+
+            #if the new value is more than 2000 then the security has split and the market value is returned to 1000
             if new >= 2000:
                 new = 1000
-                print('Rollover: High')
-            result[poss] = new
-            # print(result)
+                #TODO: add the split functionality to the player stuff
+                print('Split!')
 
+            #replaces the old market value for the chosen security with the new value
+            result[poss] = new 
+            
+            #adds the new value along with the other unchanged values to the database
             cursor.execute("INSERT INTO board_info VALUES (?,?,?,?,?,?,?)", (result))
             connection.commit()
 
