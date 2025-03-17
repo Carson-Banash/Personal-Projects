@@ -63,26 +63,35 @@ while True:
         roll_window.close()
         break
     elif event == 'Submit':
-        #print(event, values)
+        #sets the chosen variables to None, this is used for error handling
+        ch_sec,ch_mod,ch_amm = [None,None,None]
+        #the following loops though all of the values that were returned by the read of the window
         for key in values:
+            #if the value is true then that means that the radio element was selected
             if values[key] == True:
-                #print(key)
+                #if the key is in the list of securities then its a security and it is saved as the chosen security
                 if key in sec:
                     ch_sec = key
+                #if the key is in the list of modifiers then its a security and it is saved as the chosen modifier
                 elif key in mod:
                     ch_mod = key
+                #if the key is in the list of amounts then its a security and it is saved as the chosen amount
                 elif key in amm:
                     ch_amm = key
-                else:
-                    print('ERROR!!')
-
-        print('chosen security: '+ ch_sec +
-                '\nchosen modifier: '+ ch_mod +
-                '\nchosen amount: ' + ch_amm
-                )    
-            
+ 
+        #this dictionary is used to determine where the security is in the return of the board info database
         sec_key = {'grain':1,'ind':2,'bonds':3,'oil':4,'silver':5,'gold':6}
-        if ch_mod == 'up':
+
+        #if any of the chosen variables ar None then a radio element in the window was not selected
+        if ch_sec == None or ch_mod == None or ch_amm == None:
+            #a popup window is displayed to the user explaining the issue
+            sg.popup('Error!!\nOne of the options was not selected!!',title="ERROR")
+            #goes through all the elements and sets the radios back to false
+            for key in values:
+                roll_window[key].update(value=False)
+            continue
+        
+        elif ch_mod == 'up':
             cursor.execute("SELECT * FROM board_info WHERE ID=(SELECT max(ID) FROM board_info);")
             tpl_result = cursor.fetchone()
             result = [*tpl_result]
@@ -121,6 +130,7 @@ while True:
 
             cursor.execute("INSERT INTO board_info VALUES (?,?,?,?,?,?,?)", (result))
             connection.commit()
+
         elif ch_mod == 'div':
             print("\ndiv chosen")
             #gest all the current market values for the securities
@@ -178,3 +188,6 @@ while True:
                 popup_msg = ''.join([str(i) for i in amm_payable])
                 #makes the popup with the message created above
                 sg.popup(popup_msg, title='Dividend Payout')
+
+    for key in values:
+        roll_window[key].update(value=False)
