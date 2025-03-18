@@ -47,7 +47,7 @@ roll_layout = [
 #                    no_titlebar=True,
 #                    grab_anywhere=True,
 #                    default_button_element_size=(13, 1))
-roll_window = sg.Window('Roll Window', roll_layout, default_element_size=(12, 1), text_justification='b', finalize=True)
+roll_window = sg.Window('Roll Window', roll_layout, default_element_size=(12, 1), return_keyboard_events=True, finalize=True)
 
 
 #list of all possible sides of dice, used to select the right events
@@ -57,12 +57,35 @@ amm = ['5','10','20']
 
 while True:
     event, values = roll_window.read()
-
     if event in (sg.WIN_CLOSED, 'Exit'):
         print('Ending Program!')
         roll_window.close()
         break
-    elif event == 'Submit':
+
+    # Check for keyboard events ('1' through '6')
+    if event in [str(i) for i in range(1, 7)]:
+        radio_number = int(event) - 1  # Convert to index (0-based)
+        radio_keys = ['grain', 'ind', 'bonds', 'oil', 'silver', 'gold']
+        print(radio_keys[radio_number])
+        roll_window[radio_keys[radio_number]].update(value=True)  # Select the appropriate radio button
+    elif event in ['Up:2113992448','Down:2097215233','Right:2080438019','Left:2063660802']:
+        if event == 'Up:2113992448':
+            roll_window['up'].update(value=True)
+        elif event == 'Down:2097215233':
+            roll_window['down'].update(value=True)
+        else:
+            roll_window['div'].update(value=True)
+    elif event in ['a','s','d']:
+        if event == 'a':
+            roll_window['5'].update(value=True)
+        elif event == 's':
+            roll_window['10'].update(value=True)
+        elif event == 'd':
+            roll_window['15'].update(value=True)
+
+
+
+    if event == 'Submit' or event == 'Return:603979789':
         #sets the chosen variables to None, this is used for error handling
         ch_sec,ch_mod,ch_amm = [None,None,None]
         #the following loops though all of the values that were returned by the read of the window
@@ -94,7 +117,7 @@ while True:
             continue
         
         #the following is responsible for taking the board info from the data base and incrementing the chosen security by the chosen rate
-        elif ch_mod == 'up':
+        if ch_mod == 'up':
             #gets the latest entry of the security market values from the database
             cursor.execute("SELECT * FROM board_info WHERE ID=(SELECT max(ID) FROM board_info);")
             tpl_result = cursor.fetchone()
@@ -313,5 +336,5 @@ while True:
                 #makes the popup with the message created above
                 sg.popup(popup_msg, title='Dividend Payout')
 
-    for key in values:
-        roll_window[key].update(value=False)
+    # for key in values:
+    #     roll_window[key].update(value=False)
