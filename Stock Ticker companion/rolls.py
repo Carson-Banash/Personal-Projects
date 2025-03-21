@@ -86,11 +86,12 @@ def roll(database,counter,num_of_p):
             elif event == 's':
                 roll_window['10'].update(value=True)
             elif event == 'd':
-                roll_window['15'].update(value=True)
+                roll_window['20'].update(value=True)
 
 
 
         if event == 'Submit' or event == 'Return:603979789':
+            roll_num += 1
             #sets the chosen variables to None, this is used for error handling
             ch_sec,ch_mod,ch_amm = [None,None,None]
             #the following loops though all of the values that were returned by the read of the window
@@ -106,6 +107,9 @@ def roll(database,counter,num_of_p):
                     #if the key is in the list of amounts then its a security and it is saved as the chosen amount
                     elif key in amm:
                         ch_amm = key
+            
+            for key in values:
+                roll_window[key].update(value=False)
     
             #this dictionary is used to determine where the security is in the return of the board info database
             sec_key = {'grain':1,'ind':2,'bonds':3,'oil':4,'silver':5,'gold':6}
@@ -197,6 +201,7 @@ def roll(database,counter,num_of_p):
 
                         #creates the new player info that will be added to the database. the only values that are changed are the recent modifier and the new net worth
                         new_player_info = player_info.copy()
+                        new_player_info[0] = None
                         new_player_info[1] = new_player_info[1] + 1
                         new_player_info[10] = net_worth
                         
@@ -268,8 +273,8 @@ def roll(database,counter,num_of_p):
                         print(player_info)
                         print(new_player_info)
                         #adds the new player entry to the database 
-                        # cursor.execute("INSERT INTO player_info VALUES (?,?,?,?,?,?,?,?,?,?,?)", (new_player_info))
-                        # connection.commit()
+                        cursor.execute("INSERT INTO player_info VALUES (?,?,?,?,?,?,?,?,?,?,?)", (new_player_info))
+                        connection.commit()
 
                     #creates the message for the popup window as the combination of all the messages from the different players
                     popup_msg = ''.join([str(i) for i in bust_msg])
@@ -287,6 +292,7 @@ def roll(database,counter,num_of_p):
 
                         #creates the new player info that will be added to the database. the only values that are changed are the recent modifier and the new net worth
                         new_player_info = player_info.copy()
+                        new_player_info[0] = None
                         new_player_info[1] = new_player_info[1] + 1
                         new_player_info[10] = net_worth
                         
