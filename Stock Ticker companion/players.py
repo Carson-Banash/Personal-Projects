@@ -1,60 +1,32 @@
 import PySimpleGUI as sg
 import sqlite3
 
-connection = sqlite3.connect('st.db')
-cursor = connection.cursor()
-
-#DELETE THE FOLLOWING BEFORE ROLLOUT#
-cursor.execute("DROP TABLE player_info")
-connection.commit()
-cursor.execute("""CREATE TABLE player_info (
-    id INTEGER PRIMARY KEY,
-    recent INTEGER,
-    name TEXT,
-    cash INTEGER,
-    grain INTEGER,
-    ind INTEGER,
-    bonds INTEGER,  
-    oil INTEGER,
-    silver INTEGER,
-    gold INTEGER,
-    net_worth INTEGER
-);""")
-connection.commit()
-#----------------------------------#
-
-def start():
-   sg.set_options(font=('Arial', 16))
-   layout1 = [
-      [sg.Text('Welcome!!')],
-      [sg.Text('Select how many players there are:')],
-      [sg.Combo([2,3,4,5,6,7,8],default_value=' ',key='num_players')],
-      [sg.Text('How many rolls will be between Buy/Sell phase?')],
-      [sg.Slider(range=(2,20),default_value=5,orientation='horizontal',key='rolls_between')],
-      [sg.Button('Submit',key='player_entry'), sg.Button('Exit')]
-   ]
-   return sg.Window('First Window', layout1, finalize=True)
-
-def wait_to_start():
-   sg.set_options(font=('Arial', 16))
-   wait_layout = [
-      [sg.Text('Warning!!',font=('Arial',20),text_color='Yellow')],
-      [sg.Text('input player info BEFORE selecting next')],
-      [sg.Button('Next',key='start_game')]
-   ]
-   wait = sg.Window('Wait Window', wait_layout, finalize=True)
-
-   while True:
-       event, values = wait.read()
-       if event in (sg.WIN_CLOSED, 'Exit'):
-            break
-       elif event == 'start_game':
-           print(3*'\nStarting Game!!')
-
-def input_players(p_num):
+def input_players(database,p_num):
     
+    connection = sqlite3.connect(database)
+    cursor = connection.cursor()
+
+    #TODO: DELETE THE FOLLOWING BEFORE ROLLOUT#
+    cursor.execute("DROP TABLE player_info")
+    connection.commit()
+
+    cursor.execute("""CREATE TABLE player_info (
+        id INTEGER PRIMARY KEY,
+        recent INTEGER,
+        name TEXT,
+        cash INTEGER,
+        grain INTEGER,
+        ind INTEGER,
+        bonds INTEGER,  
+        oil INTEGER,
+        silver INTEGER,
+        gold INTEGER,
+        net_worth INTEGER
+    );""")
+    connection.commit()
+
     sg.set_options(font=('Arial', 16))
-    layout2 = [
+    player_input_layout = [
    [sg.Text('Enter Info For Player 1: ', key='display')],
    [sg.Text('players name: '), sg.Input(key='Name')],
    [sg.Text('Select How Many of Each Security They Start With')],
@@ -68,7 +40,7 @@ def input_players(p_num):
    [sg.Button("Submit", key='add_player'), sg.Button('Exit')],
     ]
     
-    player_window = sg.Window('Player Window', layout2, finalize=True)
+    player_window = sg.Window('Player Window', player_input_layout, finalize=True)
     player_count = 0
     flag = False
 
@@ -128,31 +100,7 @@ def input_players(p_num):
 
             if player_count == p_num:
                 player_window.close()
-                wait_to_start()
                 break
 
             flag = False
 
-#begin first while loop \
-#-------------------------------------#
-start_window = start()
-
-player_number = 1
-t_read = 0
-
-while True:
-    event, values = start_window.read()
-
-    if event in (sg.WIN_CLOSED, 'Exit'):
-        break
-
-    elif event == 'player_entry':
-        num_of_p = values['num_players']
-        amm_rolls = values['rolls_between']
-
-        if not isinstance(num_of_p, int) or num_of_p < 2 or num_of_p > 8:
-            sg.popup('Incorrect input please try again!')
-            break
-
-        start_window.close()
-        input_players(num_of_p)
