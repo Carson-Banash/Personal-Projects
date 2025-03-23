@@ -56,7 +56,17 @@ def start():
       [sg.Slider(range=(2,20),default_value=5,orientation='horizontal',key='rolls_between')],
       [sg.Button('Submit',key='player_entry'), sg.Button('Exit')]
    ]
-   return sg.Window('First Window', layout1, finalize=True)
+
+   start_window = sg.Window('Roll Window', layout1, finalize=True) 
+   while True:
+        event, values = start_window.read()
+        if event == 'player_entry':
+            num_of_p = values['num_players']
+            amm_rolls = int(values['rolls_between'])
+            start_window.close()
+            break
+
+   return num_of_p,amm_rolls
 
 def last_round():
     lr_layout = [
@@ -77,37 +87,22 @@ def last_round():
 
     return lr_amm_rolls
 
-start_window = start()
+
 
 player_number = 1
 t_read = 0
 final_round = False
 
-while True:
-    event, values = start_window.read()
+num_of_p, amm_rolls = start()
 
-    if event in (sg.WIN_CLOSED, 'Exit'):
-        break
-    
-    elif event == 'player_entry':
-        num_of_p = values['num_players']
-        amm_rolls = int(values['rolls_between'])
+# players.input_players(database,num_of_p)
 
-        if not isinstance(num_of_p, int) or num_of_p < 2 or num_of_p > 8:
-            sg.popup('Incorrect input please try again!')
-            break
-        
-        # players.input_players(database,num_of_p)
+while final_round == False:
+    rolls.roll(database,amm_rolls,num_of_p)
+    final_round = buysell.buy_sell(database)
+    print(final_round)
 
-        while final_round == False:
-            start_window.close()
-            rolls.roll(database,amm_rolls,num_of_p)
-            final_round = buysell.buy_sell(database)
-            print(final_round)
+lr_rolls = int(last_round())
+print(lr_rolls)
 
-        lr_rolls = last_round()
-        print(lr_rolls)
-
-        rolls.roll(database,lr_rolls,num_of_p)
-            
-        
+rolls.roll(database,lr_rolls,num_of_p)
