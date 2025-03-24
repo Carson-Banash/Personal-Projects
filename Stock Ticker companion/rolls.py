@@ -287,7 +287,7 @@ def roll(database,counter,num_of_p):
                         cursor.execute("SELECT * FROM player_info WHERE name = '"+player+"' AND RECENT=(SELECT max(RECENT) FROM player_info WHERE name='"+player+"');")
                         player_info = list(cursor.fetchone())
 
-                        net_worth = player_info[10] + ((10*int(ch_amm))*player_info[player_sec_key[ch_sec]])
+                        net_worth = player_info[10] - ((10*int(ch_amm))*player_info[player_sec_key[ch_sec]])
                         print(f"{player}'s net worth has changed by {((10*int(ch_amm))*player_info[player_sec_key[ch_sec]])}")
 
                         #creates the new player info that will be added to the database. the only values that are changed are the recent modifier and the new net worth
