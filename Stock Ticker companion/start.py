@@ -10,40 +10,40 @@ import buysell
 current_time = datetime.datetime.now()
 
 #creates a database file with the current date and time. for archiving
-# database = f'Stock Ticker Game {current_time.day},{current_time.month},{current_time.year} {current_time.hour}:{current_time.minute}.db'
-database = 'test.db'
-#connects to the database
-# connection = sqlite3.connect(database)
-# cursor = connection.cursor()
+database = f'Stock Ticker Game {current_time.day},{current_time.month},{current_time.year} {current_time.hour}:{current_time.minute}.db'
+# database = 'test.db'
+# connects to the database
+connection = sqlite3.connect(database)
+cursor = connection.cursor()
 
-# cursor.execute("""CREATE TABLE player_info (
-#     id INTEGER PRIMARY KEY,
-#     recent INTEGER,
-#     name TEXT,
-#     cash INTEGER,
-#     grain INTEGER,
-#     ind INTEGER,
-#     bonds INTEGER,  
-#     oil INTEGER,
-#     silver INTEGER,
-#     gold INTEGER,
-#     net_worth INTEGER
-# );""")
-# connection.commit()
+cursor.execute("""CREATE TABLE player_info (
+    id INTEGER PRIMARY KEY,
+    recent INTEGER,
+    name TEXT,
+    cash INTEGER,
+    grain INTEGER,
+    ind INTEGER,
+    bonds INTEGER,  
+    oil INTEGER,
+    silver INTEGER,
+    gold INTEGER,
+    net_worth INTEGER
+);""")
+connection.commit()
 
-# cursor.execute("""CREATE TABLE board_info (
-#     id INTEGER PRIMARY KEY AUTOINCREMENT,
-#     grain INTEGER,
-#     ind INTEGER,
-#     bonds INTEGER,  
-#     oil INTEGER,
-#     silver INTEGER,
-#     gold INTEGER
-# );""")
-# connection.commit()
+cursor.execute("""CREATE TABLE board_info (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    grain INTEGER,
+    ind INTEGER,
+    bonds INTEGER,  
+    oil INTEGER,
+    silver INTEGER,
+    gold INTEGER
+);""")
+connection.commit()
 
-# cursor.execute("INSERT INTO board_info VALUES (NULL, 1000,1000,1000,1000,1000,1000);")
-# connection.commit()
+cursor.execute("INSERT INTO board_info VALUES (NULL, 1000,1000,1000,1000,1000,1000);")
+connection.commit()
 
 #----------------------------------#
 #This function makes the starting window
@@ -162,7 +162,7 @@ final_round = False
 
 num_of_p, amm_rolls = start()
 
-# players.input_players(database,num_of_p)
+players.input_players(database,num_of_p)
 
 while final_round == False:
     rolls.roll(database,amm_rolls,num_of_p)
