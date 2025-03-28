@@ -1,13 +1,3 @@
--- CREATE TABLE users (
---     id INTEGER PRIMARY KEY,
---     name TEXT,
---     username TEXT,
---     email TEXT
--- );
-
--- INSERT INTO users (name, username, email) 
--- Values ('John','Cena','John@Cena.ca');
-
 -- CREATE TABLE player_info (
 --     id INTEGER PRIMARY KEY,
 --     recent INTEGER,
@@ -39,3 +29,4 @@ INSERT INTO board_info VALUES (NULL, 1000,1000,1000,1000,1000,1000);
 -- SELECT * FROM player_info WHERE name='Gracie' AND recent=(SELECT max(recent) FROM player_info WHERE name='Gracie');
 -- SELECT * FROM player_info WHERE name='Mom' AND recent=(SELECT max(recent) FROM player_info WHERE name='Mom');
 
+-- SELECT DISTINCT name FROM player_info WHERE name=* RECENT=(SELECT max(RECENT) FROM player_info);
