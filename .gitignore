@@ -2,3 +2,5 @@
 test.c
 Stock Ticker companion/__pycache__/
 *.db
+Stock Ticker companion/chat.py
+.DS_Store
