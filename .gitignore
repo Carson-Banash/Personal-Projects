@@ -1,3 +1,4 @@
 .vscode/settings.json
 test.c
 Stock Ticker companion/__pycache__/
+*.db
