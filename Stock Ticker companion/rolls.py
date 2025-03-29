@@ -150,6 +150,14 @@ def roll(database,counter,num_of_p):
 
                 #if the new value is more than 2000 then the security has split and the market value is returned to 1000
                 if new >= 2000:
+                    #sets the new value to 2000 indicating that it split, this is mainly done for the graph made at the end of the game
+                    new = 2000
+                    #replaces the old market value for the chosen security with the new value
+                    result[poss] = new 
+                    #adds the new value along with the other unchanged values to the database
+                    cursor.execute("INSERT INTO board_info VALUES (?,?,?,?,?,?,?)", (result))
+                    connection.commit()
+
                     #the new value is now 1000 as the security is set back to the par line of 1000
                     new = 1000
 
@@ -211,7 +219,6 @@ def roll(database,counter,num_of_p):
                         cursor.execute("INSERT INTO player_info VALUES (?,?,?,?,?,?,?,?,?,?,?)", (new_player_info))
                         connection.commit()
                         
-
                 #replaces the old market value for the chosen security with the new value
                 result[poss] = new 
                 
@@ -238,6 +245,14 @@ def roll(database,counter,num_of_p):
                 
                 #if the market value of a security falls to zero or below the security has 'busted' all owned securities by players are returned to the banker and the security marker is returned to the par line of 1000
                 if new <= 0:
+                    #sets the new value as zero this is done so that when the graph is viewed it shows that is has gone to zero
+                    new = 0
+                    #replaces the old market value for the chosen security with the new value
+                    result[poss] = new 
+                    #inserts the new high value into the database
+                    cursor.execute("INSERT INTO board_info VALUES (?,?,?,?,?,?,?)", (result))
+                    connection.commit()
+
                     #since the stock has busted it is set back to the par of 1000
                     new = 1000
 
