@@ -10,7 +10,7 @@ import buysell
 current_time = datetime.datetime.now()
 
 #creates a database file with the current date and time. for archiving
-database = f'Stock Ticker Game {current_time.day},{current_time.month},{current_time.year} {current_time.hour}:{current_time.minute}.db'
+database = f'StockTickerGame-{current_time.day},{current_time.month},{current_time.year}-{current_time.hour}:{current_time.minute}.db'
 # database = 'test.db'
 # connects to the database
 connection = sqlite3.connect(database)
