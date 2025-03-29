@@ -30,7 +30,7 @@ def create_plot(active):
             window['graph'].draw_line((x, y), (x+1, y), color=color, width=2)
     
 btn_size = (6,2)
-bt = sg.Button('Toggle all on', size=btn_size, key='toggle_all', button_color='black on grey')
+bt = sg.Button('Toggle On All', size=btn_size, key='toggle_all', button_color='black on grey')
 b1 = sg.Button('Grain', size=btn_size, key='grain',button_color='white on red')
 b2 = sg.Button('Ind.', size=btn_size, key='ind',button_color='white on red')
 b3 = sg.Button('Bonds', size=btn_size, key='bonds',button_color='white on red')
