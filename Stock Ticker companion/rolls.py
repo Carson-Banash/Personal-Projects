@@ -35,7 +35,7 @@ def roll(database,counter,num_of_p):
         sg.Radio('20','amm',key='20')
     ],
         #button for submitting the roll
-        [sg.Button('Submit',button_color=('green')),sg.Button('Exit', button_color=('white', '#00406B'))]]
+        [sg.Button('Submit',button_color=('green'))]]
 
     # window = sg.Window("Borderless Window",
     #                    layout,
