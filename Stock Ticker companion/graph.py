@@ -30,6 +30,7 @@ def create_plot(active):
             window['graph'].draw_line((x, y), (x+1, y), color=color, width=2)
     
 btn_size = (6,2)
+bt = sg.Button('Toggle all on', size=btn_size, key='toggle_all', button_color='black on grey')
 b1 = sg.Button('Grain', size=btn_size, key='grain',button_color='white on red')
 b2 = sg.Button('Ind.', size=btn_size, key='ind',button_color='white on red')
 b3 = sg.Button('Bonds', size=btn_size, key='bonds',button_color='white on red')
@@ -44,7 +45,7 @@ layout = [
         graph_top_right=(1400, 2100),
         background_color='black',
         key='graph')],
-        [sg.Text(expand_x=True,background_color='grey',size=(1,6)),b1,b2,b3,b4,b5,b6,sg.Text(expand_x=True,background_color='grey',size=(1,6))],
+        [bt,sg.Text(expand_x=True,background_color='grey',size=(1,6),pad=(0,0)),b1,b2,b3,b4,b5,b6,sg.Text(expand_x=True,background_color='grey',size=(1,6),pad=(0,0))],
           ]
 
 
@@ -55,6 +56,7 @@ securities = ['grain','ind','bonds','oil','silver','gold']
 colors = {'grain':'black on #EDC643','ind':'black on #EE7A8D','bonds':'black on #93A561','oil':'black on #94B6C5','silver':'black on #D2C3AB','gold':'black on #F2A547'}
 active = []
 
+all_on = False
 
 while True:
     event, values = window.read()
@@ -66,9 +68,23 @@ while True:
         if old_color[1] == 'red':
             window[event].update(button_color=colors[event])
             active.append(event)
-
         else:
             window[event].update(button_color='white on red')
             active.remove(event)
+    elif event == 'toggle_all':
+        if sorted(active) != sorted(securities):
+            for sec in securities:
+                if sec not in active:
+                    window[sec].update(button_color=colors[sec])
+                    active.append(sec)
+        else:
+            for sec in securities:
+                window[sec].update(button_color='white on red')
+                active.remove(sec)
+                
+    if sorted(active) == sorted(securities):
+        window['toggle_all'].update('Toggle Off All')
+    elif sorted(active) != sorted(securities) :
+        window['toggle_all'].update('Toggle On All')
     
     create_plot(active)
