@@ -149,7 +149,6 @@ def game_end(database):
         if event in (sg.WIN_CLOSED, 'End Program'):
             print('Ending Program!')
             end_window.close()
-            exit()
             break
 
         
