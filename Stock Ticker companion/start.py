@@ -5,12 +5,13 @@ import datetime
 import rolls
 import players
 import buysell
+import graph
 
 # using now() to get current time
 current_time = datetime.datetime.now()
 
 #creates a database file with the current date and time. for archiving
-database = f'Stock Ticker Game {current_time.day},{current_time.month},{current_time.year} {current_time.hour}:{current_time.minute}.db'
+database = f'StockTickerGame-{current_time.day},{current_time.month},{current_time.year}-{current_time.hour}:{current_time.minute}.db'
 # database = 'test.db'
 # connects to the database
 connection = sqlite3.connect(database)
@@ -119,7 +120,7 @@ def game_end(database):
         win_order.append((player,net_worth))
     
     win_order.sort(key=lambda x: x[-1],reverse=True)
-    print(win_order)
+    # print(win_order)
 
     layout = [
         [sg.Text("The game is now over!!\nthe leaderboard is as follows:")],
@@ -148,7 +149,6 @@ def game_end(database):
         if event in (sg.WIN_CLOSED, 'End Program'):
             print('Ending Program!')
             end_window.close()
-            exit()
             break
 
         
@@ -175,3 +175,5 @@ print(lr_rolls)
 rolls.roll(database,lr_rolls,num_of_p)
 
 game_end(database)
+
+graph.graph_game(database)
