@@ -44,7 +44,7 @@ def buy_sell(database):
         ],
     [sg.Text(expand_x=True)],
     [sg.Button("Submit", key='submit', button_color='green')],
-    [sg.Button('Done with buy/sell',button_color='#f58e07'),sg.Text(expand_x=True),sg.Button("Last round?",key='end',button_color='#07a659')]
+    [sg.Button('Done with buy/sell',button_color='#f58e07',key='Exit'),sg.Text(expand_x=True),sg.Button("Last round?",key='end',button_color='#07a659')]
         ]
 
     window = sg.Window('First Window', layout, finalize=True)
