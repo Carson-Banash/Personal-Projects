@@ -138,84 +138,84 @@ def buy_sell(database):
                 for key in buy_lst:
                     window[key].update(value=0)
 
-        elif event == 'sell':
-            #gets the name, necessary for getting the information from the database
-            ch_name = values['name_chosen'][0]
+        # elif event == 'sell':
+        #     #gets the name, necessary for getting the information from the database
+        #     ch_name = values['name_chosen'][0]
 
-            #gets the amount of owned securities of the chosen players from the database
-            cursor.execute("SELECT * FROM player_info WHERE name = '"+ch_name+"' AND RECENT=(SELECT max(RECENT) FROM player_info WHERE name='"+ch_name+"');")
-            player_info = list(cursor.fetchone())
-            cash = player_info[3]
+        #     #gets the amount of owned securities of the chosen players from the database
+        #     cursor.execute("SELECT * FROM player_info WHERE name = '"+ch_name+"' AND RECENT=(SELECT max(RECENT) FROM player_info WHERE name='"+ch_name+"');")
+        #     player_info = list(cursor.fetchone())
+        #     cash = player_info[3]
 
-            # print(player_info)
+        #     # print(player_info)
 
-            #dictionary and lists required for iterating through the chosen amounts to create lists with the amounts
-            player_sec_key = {'grain':4,'ind':5,'bonds':6,'oil':7,'silver':8,'gold':9}
-            # sell_sec = ['sell_grain','sell_ind','sell_bonds','sell_oil','sell_silver','sell_gold']
-            owned_sec = ['grain','ind','bonds','oil','silver','gold']
+        #     #dictionary and lists required for iterating through the chosen amounts to create lists with the amounts
+        #     player_sec_key = {'grain':4,'ind':5,'bonds':6,'oil':7,'silver':8,'gold':9}
+        #     # sell_sec = ['sell_grain','sell_ind','sell_bonds','sell_oil','sell_silver','sell_gold']
+        #     owned_sec = ['grain','ind','bonds','oil','silver','gold']
 
-            #The following creates the list that stores the amount of sold securities
-            amm_sell = []
-            for key in sell_lst:            
-                #appends the value of the chosen amount to sell to the list
-                amm_sell.append(int(values[key]))
+        #     #The following creates the list that stores the amount of sold securities
+        #     amm_sell = []
+        #     for key in sell_lst:            
+        #         #appends the value of the chosen amount to sell to the list
+        #         amm_sell.append(int(values[key]))
             
-            #the following creates the list that stores the owned amount of securities from the database 
-            amm_owned = []
-            for key in owned_sec:
-                #appends the owned amount of each security from the database
-                amm_owned.append(player_info[player_sec_key[key]])
+        #     #the following creates the list that stores the owned amount of securities from the database 
+        #     amm_owned = []
+        #     for key in owned_sec:
+        #         #appends the owned amount of each security from the database
+        #         amm_owned.append(player_info[player_sec_key[key]])
 
-            # print('the amount being sold is: ',amm_sell)
-            # print('the amount that is owned is: ',amm_owned)
-            # print("test statement: ",all(isinstance(sec, int) for sec in amm_sell))
+        #     # print('the amount being sold is: ',amm_sell)
+        #     # print('the amount that is owned is: ',amm_owned)
+        #     # print("test statement: ",all(isinstance(sec, int) for sec in amm_sell))
 
-            #if the user has input an amount of any security that the player does not own it is saved as a string
-            #the following catches that error, shows a popup window to the user and sets all the securities chosen
-            #back to zero
-            if not all(isinstance(sec, int) for sec in amm_sell):
-                #the following loop is for setting the chosen amounts back to zero
-                for key in sell_lst:
-                    window[key].update(value=0)
-                #creates a popup explain to the user the error
-                sg.popup("Error!\nYou are trying to sell more securities than that player owns!")
-                #skips the rest of the error due to the error
-                continue
+        #     #if the user has input an amount of any security that the player does not own it is saved as a string
+        #     #the following catches that error, shows a popup window to the user and sets all the securities chosen
+        #     #back to zero
+        #     if not all(isinstance(sec, int) for sec in amm_sell):
+        #         #the following loop is for setting the chosen amounts back to zero
+        #         for key in sell_lst:
+        #             window[key].update(value=0)
+        #         #creates a popup explain to the user the error
+        #         sg.popup("Error!\nYou are trying to sell more securities than that player owns!")
+        #         #skips the rest of the error due to the error
+        #         continue
             
-            #calculates the difference in the securities owned and the amount sold
-            final_owned_amm = [x-y for x, y in zip(amm_owned, amm_sell)]
-            print(final_amm)
-            #updates the gui to display the new amount owned to prevent double selling the same thing and if another sell action is needed
-            update_elements(sell_lst,final_owned_amm)
+        #     #calculates the difference in the securities owned and the amount sold
+        #     final_owned_amm = [x-y for x, y in zip(amm_owned, amm_sell)]
+        #     print(final_amm)
+        #     #updates the gui to display the new amount owned to prevent double selling the same thing and if another sell action is needed
+        #     update_elements(sell_lst,final_owned_amm)
             
-            #the following gets the current values of the securities on the board from the database
-            cursor.execute("SELECT * FROM board_info WHERE ID=(SELECT max(ID) FROM board_info);")
-            sec_value = list(cursor.fetchone())
-            del sec_value[0]
+        #     #the following gets the current values of the securities on the board from the database
+        #     cursor.execute("SELECT * FROM board_info WHERE ID=(SELECT max(ID) FROM board_info);")
+        #     sec_value = list(cursor.fetchone())
+        #     del sec_value[0]
 
-            cash_sell = 0
-            for i in range(6):
-                cash_sell += sec_value[i] * amm_sell[i]
+        #     cash_sell = 0
+        #     for i in range(6):
+        #         cash_sell += sec_value[i] * amm_sell[i]
             
-            total_cash = cash + cash_sell
+        #     total_cash = cash + cash_sell
 
-            print('cash in hand: %d\ncash from selling: %d\nnew total cash: %d'%(cash,cash_sell,total_cash))
+        #     print('cash in hand: %d\ncash from selling: %d\nnew total cash: %d'%(cash,cash_sell,total_cash))
             
-            new_player_info = [None,player_info[1]+1, ch_name, total_cash]+final_amm+[player_info[10]]
-            cursor.execute("INSERT INTO player_info VALUES (?,?,?,?,?,?,?,?,?,?,?)", (new_player_info))
-            connection.commit()
+        #     new_player_info = [None,player_info[1]+1, ch_name, total_cash]+final_amm+[player_info[10]]
+        #     cursor.execute("INSERT INTO player_info VALUES (?,?,?,?,?,?,?,?,?,?,?)", (new_player_info))
+        #     connection.commit()
 
-            # print(new_player_info)
+        #     # print(new_player_info)
 
-            max_amm_buy = []
-            for k in range(len(sec_value)):
-                max_amm_buy.append(total_cash//sec_value[k])
-            print(max_amm_buy)
+        #     max_amm_buy = []
+        #     for k in range(len(sec_value)):
+        #         max_amm_buy.append(total_cash//sec_value[k])
+        #     print(max_amm_buy)
 
-            update_elements(buy_lst,max_amm_buy)
+        #     update_elements(buy_lst,max_amm_buy)
             
-            sg.set_options(font=('Arial', 18))
-            sg.popup("The total cash is %d"%cash_sell)
+        #     sg.set_options(font=('Arial', 18))
+        #     sg.popup("The total cash is %d"%cash_sell)
             
         elif event in buy_lst and event not in changed:
             #gets the name, necessary for getting the information from the database
@@ -454,74 +454,74 @@ def buy_sell(database):
             cursor.execute("INSERT INTO player_info VALUES (?,?,?,?,?,?,?,?,?,?,?)", (new_player_info))
             connection.commit()
 
-        elif event == 'buy':
-            changed = []
+        # elif event == 'buy':
+        #     changed = []
 
-            ch_name = values['name_chosen'][0]
+        #     ch_name = values['name_chosen'][0]
 
-            player_sec_key = {'grain':4,'ind':5,'bonds':6,'oil':7,'silver':8,'gold':9}
-            owned_sec = ['grain','ind','bonds','oil','silver','gold']
+        #     player_sec_key = {'grain':4,'ind':5,'bonds':6,'oil':7,'silver':8,'gold':9}
+        #     owned_sec = ['grain','ind','bonds','oil','silver','gold']
 
-            cursor.execute("SELECT * FROM player_info WHERE name = '"+ch_name+"' AND RECENT=(SELECT max(RECENT) FROM player_info WHERE name='"+ch_name+"');")
-            player_info = list(cursor.fetchone())
-            cash = player_info[3]
+        #     cursor.execute("SELECT * FROM player_info WHERE name = '"+ch_name+"' AND RECENT=(SELECT max(RECENT) FROM player_info WHERE name='"+ch_name+"');")
+        #     player_info = list(cursor.fetchone())
+        #     cash = player_info[3]
 
-            #the following creates the list that stores the owned amount of securities owned from the database 
-            amm_owned = []
-            for key in owned_sec:
-                #appends the owned amount of each security from the database
-                amm_owned.append(player_info[player_sec_key[key]])
+        #     #the following creates the list that stores the owned amount of securities owned from the database 
+        #     amm_owned = []
+        #     for key in owned_sec:
+        #         #appends the owned amount of each security from the database
+        #         amm_owned.append(player_info[player_sec_key[key]])
 
             
-            #The following creates the list that stores the amount of bought securities
-            amm_buy = []
-            for key in buy_lst:            
-                #appends the value of the chosen amount to buy to the list
-                amm_buy.append(int(values[key]))
+        #     #The following creates the list that stores the amount of bought securities
+        #     amm_buy = []
+        #     for key in buy_lst:            
+        #         #appends the value of the chosen amount to buy to the list
+        #         amm_buy.append(int(values[key]))
 
-            final_amm = [x+y for x, y in zip(amm_owned, amm_buy)]
+        #     final_amm = [x+y for x, y in zip(amm_owned, amm_buy)]
 
-            cursor.execute("SELECT * FROM board_info WHERE ID=(SELECT max(ID) FROM board_info);")
-            sec_value = list(cursor.fetchone())
-            del sec_value[0]
+        #     cursor.execute("SELECT * FROM board_info WHERE ID=(SELECT max(ID) FROM board_info);")
+        #     sec_value = list(cursor.fetchone())
+        #     del sec_value[0]
 
-            cash_buy = 0
-            for i in range(6):
-                cash_buy += sec_value[i] * amm_buy[i]
+        #     cash_buy = 0
+        #     for i in range(6):
+        #         cash_buy += sec_value[i] * amm_buy[i]
             
-            total_cash = cash - cash_buy
+        #     total_cash = cash - cash_buy
 
-            print('Amount bought: ',amm_buy,'\nSecurities owned: ',amm_owned,'\nNew total: ', final_amm)
+        #     print('Amount bought: ',amm_buy,'\nSecurities owned: ',amm_owned,'\nNew total: ', final_amm)
 
-            #if the user has somehow selected more securities than they can afford their money will be below zero, 
-            #the following catches that and shows a popup window to the user and sets all the securities chosen
-            #back to zero
-            if cash_left < 0:
-                #the following loop is for setting the chosen amounts back to zero
-                for key in buy_lst:
-                    window[key].update(value=0)
-                #creates a popup explain to the user the error
-                sg.popup("Error!\nYou are trying to buy more securities than that player can afford!")
-                #skips the rest of the error due to the error
-                continue
+        #     #if the user has somehow selected more securities than they can afford their money will be below zero, 
+        #     #the following catches that and shows a popup window to the user and sets all the securities chosen
+        #     #back to zero
+        #     if cash_left < 0:
+        #         #the following loop is for setting the chosen amounts back to zero
+        #         for key in buy_lst:
+        #             window[key].update(value=0)
+        #         #creates a popup explain to the user the error
+        #         sg.popup("Error!\nYou are trying to buy more securities than that player can afford!")
+        #         #skips the rest of the error due to the error
+        #         continue
             
-            new_player_info = [None,player_info[1]+1, ch_name, total_cash]+final_amm+[player_info[10]]
-            cursor.execute("INSERT INTO player_info VALUES (?,?,?,?,?,?,?,?,?,?,?)", (new_player_info))
-            connection.commit()
+        #     new_player_info = [None,player_info[1]+1, ch_name, total_cash]+final_amm+[player_info[10]]
+        #     cursor.execute("INSERT INTO player_info VALUES (?,?,?,?,?,?,?,?,?,?,?)", (new_player_info))
+        #     connection.commit()
 
-            print('adding ',new_player_info,' to database')
+        #     print('adding ',new_player_info,' to database')
 
-            max_amm_buy = []
-            for k in range(len(sec_value)):
-                # print('\nprice of security: ',sec_price[k],'\nable to buy: ',cash//sec_price[k])
-                max_amm_buy.append(total_cash//sec_value[k])
+        #     max_amm_buy = []
+        #     for k in range(len(sec_value)):
+        #         # print('\nprice of security: ',sec_price[k],'\nable to buy: ',cash//sec_price[k])
+        #         max_amm_buy.append(total_cash//sec_value[k])
 
-            update_elements(buy_lst,max_amm_buy)
+        #     update_elements(buy_lst,max_amm_buy)
 
-            update_elements(sell_lst,final_amm)
+        #     update_elements(sell_lst,final_amm)
 
-            sg.set_options(font=('Arial', 18))
-            sg.popup("The amount of money needed for the purchase is:\n%d"%cash_buy)
+        #     sg.set_options(font=('Arial', 18))
+        #     sg.popup("The amount of money needed for the purchase is:\n%d"%cash_buy)
 
 
         event, values = window.read(timeout=1)
@@ -535,5 +535,3 @@ def buy_sell(database):
         print('previously bought',prev_buy)
 
     return final_round
-
-print('Return value is:', buy_sell('StockTickerGame-4,4,2025-20:45.db'))
