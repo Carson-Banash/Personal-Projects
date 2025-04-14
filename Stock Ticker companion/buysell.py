@@ -395,6 +395,10 @@ def buy_sell(database):
             player_info = list(cursor.fetchone())
             cash = player_info[3]
 
+            cursor.execute("SELECT * FROM board_info WHERE ID=(SELECT max(ID) FROM board_info);")
+            sec_value = list(cursor.fetchone())
+            del sec_value[0]
+
             #the following creates the list that stores the owned amount of securities from the database 
             amm_owned = []
             for key in owned_sec:
