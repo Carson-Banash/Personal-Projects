@@ -362,19 +362,22 @@ def roll(database,counter,num_of_p):
                         # print(f"{player}'s old cash ${cash} in addition to the payout of ${div_payout} is ${new_cash}")
                         # print(f"{player}'s amount owned {player_info[player_sec_key[ch_sec]]} changed amount {ch_amm} payout is ${div_payout}\n")
 
-                        #creates the string for the player that will be displayed in the popup window for the amount of the payout to receive
-                        msg = str(f"{player}'s payout is ${div_payout}\n")
-                        #extends the ongoing list of payout messages
-                        amm_payable.extend(msg)
+                        #if the player did not get a payout then dont add them to the popup window
+                        if div_payout != 0:
+                            #creates the string for the player that will be displayed in the popup window for the amount of the payout to receive
+                            msg = str(f"{player}'s payout is ${div_payout}\n")
+                            #extends the ongoing list of payout messages
+                            amm_payable.extend(msg)
                         
                         #creates the new player info that will be added to the database. the only values that are changed are the recent modifier, the new amount of cash held by the player and the new net worth
                         new_player_info = [None,player_info[1]+1,player_info[2],new_cash]+player_info[4:10]+[player_info[10]+div_payout]
                         #adds the new player entry to the database 
                         cursor.execute("INSERT INTO player_info VALUES (?,?,?,?,?,?,?,?,?,?,?)", (new_player_info))
                         connection.commit()
-
-                    #creates the message for the popup window as the combination of all the messages from the different players
-                    popup_msg = ''.join([str(i) for i in amm_payable])
-                    #makes the popup with the message created above
-                    sg.popup(popup_msg, title='Dividend Payout')
-
+                    
+                    #if the message in the popup is not empty then create the popup
+                    if amm_payable != []:
+                        #creates the message for the popup window as the combination of all the messages from the different players
+                        popup_msg = ''.join([str(i) for i in amm_payable])
+                        #makes the popup with the message created above
+                        sg.popup(popup_msg, title='Dividend Payout')
