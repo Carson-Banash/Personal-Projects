@@ -87,6 +87,20 @@ def roll(database,counter,num_of_p):
                 roll_window['10'].update(value=True)
             elif event == 'd':
                 roll_window['20'].update(value=True)
+        elif event == 'b':
+            #gets the latest entry of the security market values from the database
+            cursor.execute("SELECT * FROM board_info WHERE ID=(SELECT max(ID) FROM board_info);")
+            tpl_result = cursor.fetchone()
+            #the following converts the return from the database from a tuple to a list
+            result = [*tpl_result]
+            #sets the first element to none, this is so that when the values are added back to the database the ID, indicating the most recent entry, will be auto incremented
+            del result[0]
+            print(result)
+            msg = ''
+            for i in range(6):
+                msg += f"{sec[i]}'s value is {result[i]} \n"
+            
+            sg.popup(msg)
 
 
 
