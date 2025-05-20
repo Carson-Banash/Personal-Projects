@@ -38,6 +38,7 @@ def graph_game(database):
     b4 = sg.Button('Oil', size=btn_size, key='oil',button_color='white on red')
     b5 = sg.Button('Silver', size=btn_size, key='silver',button_color='white on red')
     b6 = sg.Button('Gold', size=btn_size, key='gold',button_color='white on red')
+    eb = sg.Button('Exit', size=btn_size, key='Exit', button_color='black on red')
 
     layout = [
         [sg.Graph(
@@ -46,11 +47,11 @@ def graph_game(database):
             graph_top_right=(1400, 2100),
             background_color='black',
             key='graph')],
-            [bt,sg.Text(expand_x=True,background_color='grey',size=(1,6),pad=(0,0)),b1,b2,b3,b4,b5,b6,sg.Text(expand_x=True,background_color='grey',size=(1,6),pad=(0,0))],
+            [bt,sg.Text(expand_x=True,background_color='grey',size=(1,6),pad=(0,0)),b1,b2,b3,b4,b5,b6,sg.Text(expand_x=True,background_color='grey',size=(1,6),pad=(0,0)),eb],
             ]
 
 
-    window = sg.Window("plot",layout, finalize=True,element_justification='c',margins=(0,0),background_color='black')
+    window = sg.Window("plot",layout, finalize=True,element_justification='c',margins=(0,0),background_color='black',no_titlebar=True)
 
 
     securities = ['grain','ind','bonds','oil','silver','gold']
@@ -62,7 +63,9 @@ def graph_game(database):
     while True:
         event, values = window.read()
 
-        if event == sg.WIN_CLOSED:
+        if event in (sg.WIN_CLOSED, 'Exit'):
+            print('Ending Program!')
+            window.close()
             break
         if event in securities:
             old_color = window[event].ButtonColor
